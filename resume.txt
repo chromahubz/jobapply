@@ -1,0 +1,12 @@
+# Your Resume/CV
+
+Paste your resume text here or edit this file with your background.
+
+Include:
+- Your experience
+- Skills
+- Education
+- Projects
+- Achievements
+
+The AI will use this to tailor your applications to each job posting.
