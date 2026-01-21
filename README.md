@@ -67,6 +67,51 @@ cp .env.example .env
 python main.py
 ```
 
+## 🎨 Two Ways to Use JobApply
+
+### Option A: Web UI (Recommended for Most Users)
+
+Beautiful browser-based interface with Apple design language!
+
+**Linux/Mac:**
+```bash
+./run_web.sh
+```
+
+**Windows:**
+```bash
+run_web.bat
+```
+
+Then open **http://localhost:5000** in your browser.
+
+**Features:**
+- 🎨 Clean, modern Apple-inspired design
+- 📱 Works on any device with a browser
+- ✨ Smooth animations and transitions
+- 📋 Easy copy-to-clipboard buttons
+- 🎯 Visual step-by-step workflow
+
+### Option B: Command Line (For Power Users)
+
+Terminal-based interface with Rich formatting.
+
+```bash
+python main.py
+```
+
+or
+
+```bash
+./run.sh
+```
+
+**Features:**
+- ⚡ Fast and lightweight
+- 💻 Perfect for terminal enthusiasts
+- 🎨 Colored output with Rich library
+- ⌨️ Keyboard-driven workflow
+
 ## Usage
 
 1. **Paste a job URL** when prompted
@@ -90,10 +135,12 @@ python main.py
 ## Tech Stack
 
 - **Python 3.10+**
-- **Groq API** - Fast LLM inference
+- **Groq API** - Fast LLM inference (Llama 3.3 70B)
+- **Flask** - Web UI framework
 - **BeautifulSoup4** - Web scraping
 - **Playwright** - Advanced scraping (optional)
 - **Rich** - Beautiful CLI interface
+- **Apple Design Language** - Modern, clean web UI
 
 ## File Structure
 

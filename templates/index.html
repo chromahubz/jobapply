@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobApply - AI Job Application Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 JobApply</h1>
+            <p class="subtitle">AI-Powered Job Application Assistant</p>
+        </header>
+
+        <div class="user-info" id="userInfo"></div>
+
+        <!-- Step 1: Enter Job URL -->
+        <section class="card" id="step1">
+            <h2>Step 1: Paste Job URL</h2>
+            <p class="help-text">Paste a job posting URL from LinkedIn, Indeed, or any job board</p>
+            <div class="input-group">
+                <input type="url" id="jobUrl" placeholder="https://www.linkedin.com/jobs/view/..." class="input-field">
+                <button onclick="scrapeJob()" class="btn btn-primary" id="scrapeBtn">
+                    <span class="btn-text">Scrape Job</span>
+                </button>
+            </div>
+            <div id="scrapeError" class="error-message" style="display: none;"></div>
+        </section>
+
+        <!-- Step 2: Review/Edit Job Details -->
+        <section class="card" id="step2" style="display: none;">
+            <h2>Step 2: Review Job Details</h2>
+            <p class="help-text">Review and edit the scraped information if needed</p>
+
+            <div class="form-group">
+                <label for="jobTitle">Job Title</label>
+                <input type="text" id="jobTitle" class="input-field" placeholder="e.g., Software Engineer">
+            </div>
+
+            <div class="form-group">
+                <label for="company">Company</label>
+                <input type="text" id="company" class="input-field" placeholder="e.g., Google">
+            </div>
+
+            <div class="form-group">
+                <label for="description">Job Description</label>
+                <textarea id="description" class="textarea-field" rows="10" placeholder="Paste or edit the job description..."></textarea>
+            </div>
+
+            <button onclick="showGenerateOptions()" class="btn btn-primary">Continue to Generate</button>
+        </section>
+
+        <!-- Step 3: Generate Materials -->
+        <section class="card" id="step3" style="display: none;">
+            <h2>Step 3: Generate Application Materials</h2>
+            <p class="help-text">Select what you want to generate</p>
+
+            <div class="checkbox-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="coverLetter" checked>
+                    <span>Cover Letter</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="applicationEmail" checked>
+                    <span>Application Email</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="recruiterEmail" checked>
+                    <span>Recruiter Outreach Email</span>
+                </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="linkedinMessage" checked>
+                    <span>LinkedIn Message</span>
+                </label>
+            </div>
+
+            <button onclick="generateContent()" class="btn btn-success btn-large" id="generateBtn">
+                <span class="btn-text">🤖 Generate with AI</span>
+            </button>
+            <div id="generateError" class="error-message" style="display: none;"></div>
+        </section>
+
+        <!-- Step 4: Results -->
+        <section class="card" id="results" style="display: none;">
+            <h2>✅ Generated Successfully!</h2>
+            <p class="help-text">Your application materials have been generated and saved</p>
+
+            <div id="resultsContent"></div>
+
+            <div class="action-buttons">
+                <button onclick="location.reload()" class="btn btn-secondary">Start New Application</button>
+            </div>
+        </section>
+
+        <footer>
+            <p>💡 Tip: Always review and personalize AI-generated content before sending</p>
+            <p class="small">Powered by Groq LLM • Made with ❤️ for job seekers</p>
+        </footer>
+    </div>
+
+    <script>
+        // Load user config on page load
+        window.onload = async () => {
+            try {
+                const response = await fetch('/config');
+                const config = await response.json();
+                document.getElementById('userInfo').innerHTML = `
+                    <div class="info-pill">👤 ${config.your_name}</div>
+                    <div class="info-pill">📧 ${config.your_email}</div>
+                    <div class="info-pill">${config.has_resume ? '✅ Resume Loaded' : '⚠️ Add resume to resume.txt'}</div>
+                `;
+            } catch (e) {
+                console.error('Failed to load config:', e);
+            }
+        };
+
+        async function scrapeJob() {
+            const url = document.getElementById('jobUrl').value.trim();
+            const btn = document.getElementById('scrapeBtn');
+            const errorDiv = document.getElementById('scrapeError');
+
+            if (!url) {
+                showError(errorDiv, 'Please enter a job URL');
+                return;
+            }
+
+            errorDiv.style.display = 'none';
+            btn.disabled = true;
+            btn.innerHTML = '<span class="btn-text">⏳ Scraping...</span>';
+
+            try {
+                const response = await fetch('/scrape', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('jobTitle').value = data.data.title;
+                    document.getElementById('company').value = data.data.company;
+                    document.getElementById('description').value = data.data.description;
+
+                    document.getElementById('step2').style.display = 'block';
+                    document.getElementById('step2').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    showError(errorDiv, data.error || 'Failed to scrape job posting');
+                }
+            } catch (error) {
+                showError(errorDiv, 'Network error. Please check the URL and try again.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span class="btn-text">Scrape Job</span>';
+            }
+        }
+
+        function showGenerateOptions() {
+            document.getElementById('step3').style.display = 'block';
+            document.getElementById('step3').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        async function generateContent() {
+            const jobTitle = document.getElementById('jobTitle').value.trim();
+            const company = document.getElementById('company').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const btn = document.getElementById('generateBtn');
+            const errorDiv = document.getElementById('generateError');
+
+            // Check what's selected
+            const outputTypes = [];
+            if (document.getElementById('coverLetter').checked) outputTypes.push('cover_letter');
+            if (document.getElementById('applicationEmail').checked) outputTypes.push('application_email');
+            if (document.getElementById('recruiterEmail').checked) outputTypes.push('recruiter_email');
+            if (document.getElementById('linkedinMessage').checked) outputTypes.push('linkedin_message');
+
+            if (!jobTitle || !company || !description) {
+                showError(errorDiv, 'Please fill in all job details');
+                return;
+            }
+
+            if (outputTypes.length === 0) {
+                showError(errorDiv, 'Please select at least one output type');
+                return;
+            }
+
+            errorDiv.style.display = 'none';
+            btn.disabled = true;
+            btn.innerHTML = '<span class="btn-text">🤖 Generating... (this may take 10-30 seconds)</span>';
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        job_title: jobTitle,
+                        company: company,
+                        description: description,
+                        output_types: outputTypes
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayResults(data.results);
+                    document.getElementById('results').style.display = 'block';
+                    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    showError(errorDiv, data.error || 'Failed to generate content');
+                }
+            } catch (error) {
+                showError(errorDiv, 'Network error. Please try again.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span class="btn-text">🤖 Generate with AI</span>';
+            }
+        }
+
+        function displayResults(results) {
+            const container = document.getElementById('resultsContent');
+            container.innerHTML = '';
+
+            const typeNames = {
+                'cover_letter': '📄 Cover Letter',
+                'application_email': '✉️ Application Email',
+                'recruiter_email': '📧 Recruiter Outreach Email',
+                'linkedin_message': '💼 LinkedIn Message'
+            };
+
+            for (const [type, content] of Object.entries(results)) {
+                const resultCard = document.createElement('div');
+                resultCard.className = 'result-card';
+                resultCard.innerHTML = `
+                    <h3>${typeNames[type]}</h3>
+                    <div class="result-content">${escapeHtml(content).replace(/\n/g, '<br>')}</div>
+                    <button onclick="copyToClipboard(this, '${type}')" class="btn btn-secondary btn-small">
+                        📋 Copy to Clipboard
+                    </button>
+                `;
+                container.appendChild(resultCard);
+            }
+        }
+
+        function copyToClipboard(btn, type) {
+            const content = document.querySelector(`[onclick*="${type}"]`).parentElement.querySelector('.result-content').innerText;
+            navigator.clipboard.writeText(content).then(() => {
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '✅ Copied!';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                }, 2000);
+            });
+        }
+
+        function showError(element, message) {
+            element.textContent = message;
+            element.style.display = 'block';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Allow Enter key to submit URL
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('jobUrl').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') scrapeJob();
+            });
+        });
+    </script>
+</body>
+</html>

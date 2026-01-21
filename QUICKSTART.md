@@ -2,7 +2,25 @@
 
 ## The Absolute Easiest Way to Get Started
 
-### 1️⃣ Run ONE Command
+### 1️⃣ Choose Your Interface
+
+**🎨 Web UI (Recommended - Beautiful Apple Design)**
+
+**Linux/Mac:**
+```bash
+./run_web.sh
+```
+
+**Windows:**
+```bash
+run_web.bat
+```
+
+Opens in your browser at http://localhost:5000
+
+**OR**
+
+**💻 Command Line (For Terminal Fans)**
 
 **Linux/Mac:**
 ```bash
@@ -14,7 +32,7 @@
 run.bat
 ```
 
-That's it! The script will:
+Both scripts will:
 - Check if you need setup
 - Install everything automatically
 - Guide you through configuration
