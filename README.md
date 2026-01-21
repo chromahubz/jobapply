@@ -1,14 +1,22 @@
-# JobApply - AI-Powered Job Application Assistant
+# 🚀 JobApply - AI-Powered Job Application Assistant
 
-Automate your job applications with AI! Paste job posting URLs, scrape descriptions, and generate tailored cover letters, emails, and LinkedIn messages using Groq LLM.
+> **Apply to 10 jobs in 10 minutes.** Automate your job hunt with AI-generated cover letters, emails, and LinkedIn messages.
 
-## Features
+Stop spending hours crafting applications. Paste a job URL, and JobApply creates personalized, professional application materials in seconds using Groq's lightning-fast Llama 3.3 70B model.
 
-- 📋 **URL-based scraping**: Paste any job posting URL to extract details
-- 🤖 **AI-powered generation**: Uses Groq LLM to create personalized responses
-- ✉️ **Multiple formats**: Cover letters, emails, LinkedIn messages
-- 💾 **Auto-save**: All outputs saved to organized files
-- 🎨 **Interactive CLI**: Beautiful terminal interface with Rich
+**🎨 [View Demo & Features](DEMO.md)** | **📖 [Quick Start Guide](QUICKSTART.md)**
+
+---
+
+## ✨ What You Get
+
+- 📋 **Smart Job Scraping**: LinkedIn, Indeed, Greenhouse, or any job board
+- 🤖 **AI Generation**: Personalized cover letters, emails, LinkedIn messages
+- 🎨 **Beautiful Web UI**: Apple-inspired design with glassmorphism effects
+- 💻 **Power CLI**: Rich terminal interface for command-line fans
+- ⚡ **Lightning Fast**: 20-30 seconds for complete application package
+- 💾 **Auto-Save**: Everything organized by job and timestamp
+- 🆓 **100% Free**: No costs, no limits (with free Groq API)
 
 ## 🚀 Super Easy Setup (2 Minutes!)
 
